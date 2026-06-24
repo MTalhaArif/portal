@@ -1,0 +1,189 @@
+Dashboard
+
+Sub-Agency
+
+Students
+
+Universities
+
+Programs
+
+Export
+
+Applications
+
+Analytics
+
+Settings
+
+Muhammad Talha Arif
+9+
+MT
+Muhammad Talha
+Logout
+Universities
+
+20 universities available
+
+Export Excel
+Export PDF
+All Status
+Active
+Inactive
+All Types
+Public
+Private
+All Countries
+Turkey
+All Cities
+Istanbul
+Istanbul
+Tokat
+istanbul
+All Campuses
+Has Campuses
+No Campuses
+Name	Country	City	Type	Campuses	Email	Students	Status	Actions
+
+Istanbul Okan University
+	Turkey	Istanbul	Private	
+4 campuses
+		0	Active	
+
+
+Istanbul Medipol University
+	Turkey	Istanbul	Private	
+4 campuses
+		0	Active	
+
+
+Tokat Gaziosmanpasa University ( Public)
+	Turkey	Tokat	Public	
+1 campus
+		0	Inactive	
+
+
+Istanbul Atlas University
+	Turkey	Istanbul	Private	
+2 campuses
+		0	Active	
+
+
+Istanbul Kent‏‏ University
+	Turkey	Istanbul	Private	
+2 campuses
+		0	Active	
+
+
+Istanbul Topkapi University
+	Turkey	Istanbul	Private	
+8 campuses
+		0	Active	
+
+
+Istanbul Beykoz ‏‏University
+	Turkey	Istanbul	Private	
+7 campuses
+		0	Active	
+
+
+Istanbul Arel University
+	Turkey	Istanbul	Private	
+3 campuses
+		0	Active	
+
+
+Istanbul Yeni Yüzyıl University
+	Turkey	Istanbul	Private	
+5 campuses
+		0	Active	
+
+
+Istanbul Beykent University
+	Turkey	Istanbul	Private	
+4 campuses
+		0	Active	
+
+
+Istanbul Nişantaşı University
+	Turkey	Istanbul	Private	
+3 campuses
+		0	Active	
+
+
+Istanbul Health and Technology University
+	Turkey	istanbul	Private	
+1 campus
+		0	Active	
+
+
+Istanbul Biruni University
+	Turkey	Istanbul	Private	
+1 campus
+		0	Active	
+
+
+Istanbul Aydin University
+	Turkey	Istanbul	Private	
+7 campuses
+		0	Active	
+
+
+Istanbul Gedik University
+	Turkey	Istanbul	Private	
+5 campuses
+		0	Active	
+
+
+Istanbul Kültür University
+	Turkey	Istanbul	Private	
+7 campuses
+		0	Active	
+
+
+Istanbul Sabahattin Zaim University
+	Turkey	Istanbul	Private	
+4 campuses
+		0	Active	
+
+
+Istanbul Gelişim University
+	Turkey	Istanbul	Private	
+3 campuses
+		0	Active	
+
+
+Istanbul Uskudar University
+	Turkey	Istanbul	Private	
+3 campuses
+		0	Active	
+
+
+Istanbul Fenerbahçe University
+	Turkey	Istanbul	Private	
+3 campuses
+		0	Active	
+Important Notice for All Students
+
+All students who have successfully obtained their Turkish visa and are planning to travel to Türkiye must not purchase their flight tickets before receiving the official  confirmation email from the university.
+
+After receiving your visa, please send us an email request so we can arrange the university confirmation email.
+
+Important: Immigration authorities (FIA) may ask to see this university confirmation email at the airport. Students without it may face travel difficulties.
+
+*Please follow this order:*
+
+ Obtain your visa
+
+Send us your email request.
+
+Receive the university confirmation email.
+
+Purchase your flight ticket.
+
+Travel to Türkiye safely.
+
+
+Thank you for your cooperation.
+
+Got it
