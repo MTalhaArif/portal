@@ -80,9 +80,9 @@ import UNIVERSITIES_DATA from './universities_data.json';
 
 function initUniversities() {
   if (typeof window === 'undefined') return UNIVERSITIES_DATA;
-  const cached = localStorage.getItem('pp_col_universities');
+  const cached = localStorage.getItem('pp_col_universities_v2');
   if (!cached || cached === '[]') {
-    localStorage.setItem('pp_col_universities', JSON.stringify(UNIVERSITIES_DATA));
+    localStorage.setItem('pp_col_universities_v2', JSON.stringify(UNIVERSITIES_DATA));
     return UNIVERSITIES_DATA;
   }
   try {
