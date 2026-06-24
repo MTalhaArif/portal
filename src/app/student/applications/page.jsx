@@ -28,6 +28,9 @@ export default function StudentApplicationsPage() {
   const [progress, setProgress] = useState(0);
   const [toast, setToast] = useState('');
   const [uniSearch, setUniSearch] = useState('');
+  const [uniCity, setUniCity] = useState('All');
+
+  const locations = ['All', ...new Set(UNIVERSITIES.map(u => u.location))].filter(Boolean).sort();
 
   const load = async () => { if (!user) return; const d = await getUserApplications(user.uid); setApps(d); };
   useEffect(() => { load(); }, [user]);
@@ -106,15 +109,25 @@ export default function StudentApplicationsPage() {
   const renderStep = () => {
     switch(step) {
       case 0: {
-        const filteredUnis = UNIVERSITIES.filter(u => u.name.toLowerCase().includes(uniSearch.toLowerCase()) || (u.location && u.location.toLowerCase().includes(uniSearch.toLowerCase())));
+        const filteredUnis = UNIVERSITIES.filter(u => {
+          const matchSearch = u.name.toLowerCase().includes(uniSearch.toLowerCase()) || (u.location && u.location.toLowerCase().includes(uniSearch.toLowerCase()));
+          const matchCity = uniCity === 'All' || u.location === uniCity;
+          return matchSearch && matchCity;
+        });
+        
         return (
           <div style={{ display:'flex', flexDirection:'column', height:'100%' }}>
             <p style={{ fontSize:'0.875rem', color:'var(--text-secondary)', marginBottom:12 }}>Select a university and program to apply to:</p>
             
-            <div className="search-box" style={{ marginBottom: 16 }}>
-              <Search size={15} />
-              <input type="text" className="form-input" placeholder="Search for a university..."
-                value={uniSearch} onChange={e => setUniSearch(e.target.value)} />
+            <div style={{ display:'flex', gap:10, marginBottom: 16 }}>
+              <div className="search-box" style={{ flex: 1 }}>
+                <Search size={15} />
+                <input type="text" className="form-input" placeholder="Search for a university..."
+                  value={uniSearch} onChange={e => setUniSearch(e.target.value)} />
+              </div>
+              <select className="form-select" style={{ width: 160 }} value={uniCity} onChange={e => setUniCity(e.target.value)}>
+                {locations.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
             </div>
 
             <div style={{ display:'flex', flexDirection:'column', gap:12, maxHeight:360, overflowY:'auto', paddingRight:8 }}>
