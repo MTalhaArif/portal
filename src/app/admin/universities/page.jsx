@@ -13,7 +13,7 @@ export default function AdminUniversitiesPage() {
   const [langFilter, setLangFilter] = useState('All');
   const [selectedUni, setSelectedUni] = useState(null);
 
-  const cities = ['All', ...new Set(UNIVERSITIES.map(u => u.city))];
+  const locations = ['All', ...new Set(UNIVERSITIES.map(u => u.location))].filter(Boolean).sort();
 
   const filtered = UNIVERSITIES.filter(u => {
     const q = search.toLowerCase();
@@ -21,7 +21,7 @@ export default function AdminUniversitiesPage() {
       u.name.toLowerCase().includes(q) ||
       u.programs.some(p => p.toLowerCase().includes(q)) ||
       u.description?.toLowerCase().includes(q);
-    const matchCity = city === 'All' || u.city === city;
+    const matchCity = city === 'All' || u.location === city;
     const matchDegree = degreeFilter === 'All' || (u.degrees || []).includes(degreeFilter);
     const matchLang = langFilter === 'All' || (u.languages || []).includes(langFilter);
     return matchSearch && matchCity && matchDegree && matchLang;
@@ -45,7 +45,7 @@ export default function AdminUniversitiesPage() {
               value={search} onChange={e => setSearch(e.target.value)} id="uni-search" />
           </div>
           <select className="form-select" style={{ width:140 }} value={city} onChange={e=>setCity(e.target.value)}>
-            {cities.map(c=><option key={c}>{c}</option>)}
+            {locations.map(c=><option key={c}>{c}</option>)}
           </select>
           <select className="form-select" style={{ width:180 }} value={degreeFilter} onChange={e=>setDegreeFilter(e.target.value)}>
             <option value="All">All Degrees</option>
@@ -74,13 +74,13 @@ export default function AdminUniversitiesPage() {
             {/* Card header */}
             <div style={{ background:'linear-gradient(135deg, #0d1b2a 0%, #1a2f4a 100%)', padding:'20px 20px 16px', position:'relative' }}>
               <div className="flex items-center gap-3">
-                <div style={{ width:48, height:48, background:'rgba(232,93,4,.2)', borderRadius:12, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.5rem', flexShrink:0, border:'1px solid rgba(232,93,4,.3)' }}>
-                  {uni.logo}
+                <div style={{ width:48, height:48, borderRadius:12, flexShrink:0, overflow:'hidden', border:'1px solid rgba(255,255,255,.2)', background:'#fff' }}>
+                  <img src={uni.logo} alt={uni.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                 </div>
                 <div style={{ flex:1, minWidth:0 }}>
-                  <h3 style={{ fontWeight:700, fontSize:'0.92rem', color:'#fff', lineHeight:1.3, marginBottom:3 }}>{uni.name}</h3>
-                  <div style={{ display:'flex', alignItems:'center', gap:4, fontSize:'0.78rem', color:'rgba(255,255,255,.6)' }}>
-                    <MapPin size={11} /> {uni.city}, {uni.country}
+                  <h3 style={{ fontWeight:700, fontSize:'0.92rem', color:'#fff', lineHeight:1.3, marginBottom:3, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{uni.name}</h3>
+                  <div style={{ display:'flex', alignItems:'center', gap:4, fontSize:'0.78rem', color:'rgba(255,255,255,.6)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+                    <MapPin size={11} flexShrink={0} /> <span style={{overflow:'hidden', textOverflow:'ellipsis'}}>{uni.location}</span>
                   </div>
                 </div>
                 <span style={{ background: uni.type==='Public'?'rgba(34,197,94,.15)':'rgba(232,93,4,.15)', color: uni.type==='Public'?'#22c55e':'#e85d04', border:`1px solid ${uni.type==='Public'?'rgba(34,197,94,.3)':'rgba(232,93,4,.3)'}`, borderRadius:99, padding:'2px 10px', fontSize:'0.7rem', fontWeight:700, flexShrink:0 }}>
@@ -161,9 +161,12 @@ export default function AdminUniversitiesPage() {
         <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&setSelectedUni(null)}>
           <div className="modal-box" style={{ maxWidth:600 }}>
             <div className="modal-header" style={{ background:'linear-gradient(135deg, #0d1b2a, #1a2f4a)' }}>
-              <div>
-                <span className="modal-title" style={{ color:'#fff', fontSize:'1.1rem' }}>{selectedUni.logo} {selectedUni.name}</span>
-                <p style={{ color:'rgba(255,255,255,.55)', fontSize:'0.8rem', marginTop:2 }}>{selectedUni.city}, {selectedUni.country} · {selectedUni.type}</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <img src={selectedUni.logo} alt="" style={{ width: 44, height: 44, borderRadius: 8, background:'#fff' }} />
+                <div>
+                  <span className="modal-title" style={{ color:'#fff', fontSize:'1.1rem', display:'block', marginBottom:2 }}>{selectedUni.name}</span>
+                  <p style={{ color:'rgba(255,255,255,.55)', fontSize:'0.8rem', margin:0 }}>{selectedUni.location} · {selectedUni.type}</p>
+                </div>
               </div>
               <button className="btn btn-ghost btn-icon" onClick={()=>setSelectedUni(null)} style={{ color:'#fff' }}>✕</button>
             </div>
