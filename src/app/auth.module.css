@@ -1,0 +1,235 @@
+.split {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Left branding panel */
+.leftPanel {
+  flex: 0 0 42%;
+  background: linear-gradient(160deg, #0d1b2a 0%, #1a2d42 60%, #0d1b2a 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.leftPanel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(232,93,4,.15) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 32px;
+  z-index: 1;
+}
+
+.logoIcon {
+  width: 64px;
+  height: 64px;
+  background: var(--primary);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -1px;
+  flex-shrink: 0;
+}
+
+.brandTitle {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.brandTitle span {
+  color: var(--primary);
+}
+
+.tagline {
+  font-size: 1rem;
+  color: rgba(255,255,255,.65);
+  text-align: center;
+  max-width: 300px;
+  line-height: 1.7;
+  z-index: 1;
+}
+
+.dividerLine {
+  width: 56px;
+  height: 3px;
+  background: var(--primary);
+  border-radius: 2px;
+  margin: 20px 0;
+}
+
+.featureList {
+  list-style: none;
+  z-index: 1;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.featureItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255,255,255,.75);
+  font-size: 0.9rem;
+}
+
+.featureIcon {
+  width: 32px;
+  height: 32px;
+  background: rgba(232,93,4,.2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+/* Right form panel */
+.rightPanel {
+  flex: 1;
+  background: #f5f6fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 40px;
+}
+
+.formCard {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.1);
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.formTitle {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.formSubtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 28px;
+}
+
+.formGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.passwordWrapper {
+  position: relative;
+}
+
+.passwordWrapper input {
+  padding-right: 44px;
+}
+
+.eyeBtn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  padding: 4px;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 12px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(232,93,4,.35);
+}
+
+.submitBtn:disabled {
+  opacity: .65;
+  cursor: not-allowed;
+}
+
+.linkRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+  font-size: 0.875rem;
+}
+
+.link {
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: inherit;
+}
+
+.link:hover { text-decoration: underline; }
+
+.errorMsg {
+  background: var(--danger-bg);
+  color: var(--danger);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .split { flex-direction: column; }
+  .leftPanel { flex: none; padding: 32px 24px; min-height: auto; }
+  .rightPanel { padding: 32px 20px; }
+  .formCard { padding: 28px 24px; }
+  .formRow { grid-template-columns: 1fr; }
+}
