@@ -1,10 +1,9 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Plus, ChevronRight, ChevronLeft, ClipboardList } from 'lucide-react';
+import { Plus, ChevronRight, ChevronLeft, ClipboardList, CloudUpload, FileText, Trash2, Eye, Search, Globe } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { getUserApplications, addApplication } from '@/lib/firestore';
+import { getUserApplications, addApplication, UNIVERSITIES } from '@/lib/firestore';
 import { uploadFile, deleteFile } from '@/lib/storage';
-import { CloudUpload, FileText, Trash2, Eye } from 'lucide-react';
 
 const STAGES = [
   'Waiting Approval','Ready for Application','Evaluation','Offer Letter',
@@ -20,8 +19,8 @@ const WIZARD_STEPS = ['Term & Type', 'Personal Info', 'Program Details', 'Docume
 const EMPTY = {
   term: TERMS[0], degreeType: 'Bachelor',
   firstName: '', lastName: '', dateOfBirth: '', nationality: '', passportNumber: '',
-  email: '', phone: '',
-  university: '', program: '', gpa: '',
+  email: '', phone: '', gpa: '',
+  universityId: '', university: '', program: '',
   docNotes: '', documents: []
 };
 
@@ -35,6 +34,10 @@ export default function ApplicationsPage() {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [toast, setToast] = useState('');
+  const [uniSearch, setUniSearch] = useState('');
+  const [uniCity, setUniCity] = useState('');
+
+  const locations = [...new Set(UNIVERSITIES.map(u => u.location))].filter(Boolean).sort();
 
   const load = async () => {
     if (!user) return;
@@ -127,7 +130,7 @@ export default function ApplicationsPage() {
             {[['First Name','firstName','text'],['Last Name','lastName','text'],
               ['Date of Birth','dateOfBirth','date'],['Nationality','nationality','text'],
               ['Passport Number','passportNumber','text'],['Email','email','email'],
-              ['Phone','phone','tel']].map(([label, field, type]) => (
+              ['Phone','phone','tel'],['GPA / Grade','gpa','text']].map(([label, field, type]) => (
               <div className="form-group" key={field}>
                 <label className="form-label">{label}</label>
                 <input type={type} className="form-input" value={form[field]} onChange={set(field)} />
@@ -135,23 +138,70 @@ export default function ApplicationsPage() {
             ))}
           </div>
         );
-      case 2:
+      case 2: {
+        const filteredUnis = uniCity ? UNIVERSITIES.filter(u => {
+          const matchSearch = u.name.toLowerCase().includes(uniSearch.toLowerCase()) || (u.location && u.location.toLowerCase().includes(uniSearch.toLowerCase()));
+          const matchCity = u.location === uniCity;
+          return matchSearch && matchCity;
+        }) : [];
         return (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            <div className="form-group" style={{ gridColumn: '1/-1' }}>
-              <label className="form-label">University</label>
-              <input type="text" className="form-input" value={form.university} onChange={set('university')} />
+          <div style={{ display:'flex', flexDirection:'column', height:'100%' }}>
+            <p style={{ fontSize:'0.875rem', color:'var(--text-secondary)', marginBottom:12 }}>Select a city first, then choose a university to apply to:</p>
+            
+            <div style={{ display:'flex', gap:10, marginBottom: 16 }}>
+              <div className="search-box" style={{ flex: 1 }}>
+                <Search size={15} />
+                <input type="text" className="form-input" placeholder="Search for a university..."
+                  value={uniSearch} onChange={e => setUniSearch(e.target.value)} />
+              </div>
+              <select className="form-select" style={{ width: 200 }} value={uniCity} onChange={e => setUniCity(e.target.value)}>
+                <option value="" disabled>Select a City...</option>
+                {locations.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
             </div>
-            <div className="form-group" style={{ gridColumn: '1/-1' }}>
-              <label className="form-label">Program / Major</label>
-              <input type="text" className="form-input" value={form.program} onChange={set('program')} />
-            </div>
-            <div className="form-group">
-              <label className="form-label">GPA / Grade</label>
-              <input type="text" className="form-input" value={form.gpa} onChange={set('gpa')} />
+
+            <div style={{ display:'flex', flexDirection:'column', gap:12, maxHeight:360, overflowY:'auto', paddingRight:8 }}>
+              {!uniCity && (
+                <div style={{ padding:40, textAlign:'center', color:'var(--text-secondary)', background:'#f8f9fa', borderRadius:10, border:'2px dashed var(--border-light)' }}>
+                  <Globe size={32} style={{ margin:'0 auto 12px', opacity:0.5 }} />
+                  <p style={{ fontWeight:600 }}>No City Selected</p>
+                  <p style={{ fontSize:'0.85rem', marginTop:4 }}>Please select a city from the dropdown above to view available universities.</p>
+                </div>
+              )}
+              {uniCity && filteredUnis.length === 0 && (
+                <div style={{ padding:24, textAlign:'center', color:'var(--text-secondary)' }}>No universities found matching your search.</div>
+              )}
+              {uniCity && filteredUnis.map(uni => (
+                <div key={uni.id} style={{ border:`2px solid ${form.universityId===uni.id?'var(--primary)':'var(--border)'}`, borderRadius:10, padding:16, cursor:'pointer', background: form.universityId===uni.id?'var(--primary-light)':'#fff', transition:'all 0.15s' }}
+                  onClick={() => setForm(p=>({...p, universityId:uni.id, university:uni.name, program: p.universityId===uni.id ? p.program : ''}))}>
+                  
+                  <div className="flex items-center gap-3">
+                    <img src={uni.logo} alt="" style={{ width:40, height:40, borderRadius:8, objectFit:'cover', border:'1px solid var(--border-light)' }} />
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <p style={{ fontWeight:700, marginBottom:2, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{uni.name}</p>
+                      <p style={{ fontSize:'0.8rem', color:'var(--text-secondary)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{uni.location}</p>
+                    </div>
+                  </div>
+                  
+                  {form.universityId === uni.id && (
+                    <div style={{ marginTop:16, paddingTop:16, borderTop:'1px solid var(--border-light)' }}>
+                      <p style={{ fontWeight:600, fontSize:'0.8125rem', marginBottom:10 }}>Choose a program to apply for:</p>
+                      <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+                        {uni.programs.map(prog => (
+                          <button key={prog} onClick={e=>{e.stopPropagation(); setForm(p=>({...p,program:prog}));}}
+                            style={{ padding:'6px 12px', borderRadius:8, border:`1.5px solid ${form.program===prog?'var(--primary)':'var(--border)'}`, background:form.program===prog?'var(--primary)':'#fff', color:form.program===prog?'#fff':'var(--text-primary)', fontSize:'0.8rem', fontWeight:600, cursor:'pointer', transition:'all 0.15s' }}>
+                            {prog}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         );
+      }
       case 3:
         return (
           <div>
