@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { getUserApplications, getUserDocuments, getClients } from '@/lib/firestore';
+import { getUserApplications, getUserDocuments, getAllStudents } from '@/lib/firestore';
 import {
   Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement,
   BarElement, Title, Tooltip, Legend, ArcElement,
@@ -27,9 +27,9 @@ export default function AnalyticsPage() {
     Promise.all([
       getUserApplications(user.uid),
       getUserDocuments(user.uid),
-      getClients(user.uid),
-    ]).then(([apps, docs, clients]) => {
-      setStats({ apps: apps.length, docs: docs.length, clients: clients.length });
+      getAllStudents(),
+    ]).then(([apps, docs, students]) => {
+      setStats({ apps: apps.length, docs: docs.length, clients: students.length });
 
       // By month
       const aByM = Array(12).fill(0);

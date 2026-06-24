@@ -43,15 +43,11 @@ export async function removeDocument(collectionName, id) {
   saveCollection(collectionName, col);
 }
 
-// ─── Clients ───────────────────────────────────────────────────────────────────
-export const getClients = async (ownerUid) => {
-  const col = getCollection('clients');
-  return col.filter(c => c.ownerUid === ownerUid);
+// ─── Students (all users with role=student) ────────────────────────────────────
+export const getAllStudents = async () => {
+  const col = getCollection('users');
+  return col.filter(u => u.role === 'student');
 };
-export const getAllClients = () => getDocuments('clients');
-export const addClient = (data) => addDocument('clients', data);
-export const updateClient = (id, data) => updateDocument('clients', id, data);
-export const deleteClient = (id) => removeDocument('clients', id);
 
 // ─── Documents ─────────────────────────────────────────────────────────────────
 export const getUserDocuments = async (ownerUid) => {
@@ -72,5 +68,23 @@ export const getAllApplications = () => getDocuments('applications');
 export const addApplication = (data) => addDocument('applications', data);
 export const updateApplication = (id, data) => updateDocument('applications', id, data);
 
-// ─── Users ─────────────────────────────────────────────────────────────────────
+// ─── Users / agencies ──────────────────────────────────────────────────────────
 export const getAllUsers = () => getDocuments('users');
+export const getAllAgencies = async () => {
+  const col = getCollection('users');
+  return col.filter(u => u.role === 'agency');
+};
+
+// ─── Universities (seed data if empty) ────────────────────────────────────────
+export const UNIVERSITIES = [
+  { id: 'u1', name: 'Istanbul Aydin University',           city: 'Istanbul', country: 'Turkey', programs: ['Medicine','Engineering','Business','Law','Arts'], logo: '🎓' },
+  { id: 'u2', name: 'Istanbul Health & Technology Univ.',  city: 'Istanbul', country: 'Turkey', programs: ['Medicine','Nursing','Pharmacy','Biomedical'], logo: '🏥' },
+  { id: 'u3', name: 'Istanbul Gelisim University',         city: 'Istanbul', country: 'Turkey', programs: ['Business','Psychology','Architecture','IT'], logo: '🎓' },
+  { id: 'u4', name: 'Istanbul Topkapi University',         city: 'Istanbul', country: 'Turkey', programs: ['Engineering','Law','Education','Economics'], logo: '🎓' },
+  { id: 'u5', name: 'Istanbul Kent University',            city: 'Istanbul', country: 'Turkey', programs: ['Business','Arts','Social Sciences','IT'], logo: '🎓' },
+  { id: 'u6', name: 'Ankara Yildirim Beyazit University',  city: 'Ankara',   country: 'Turkey', programs: ['Medicine','Law','Engineering','Science'], logo: '🏛️' },
+  { id: 'u7', name: 'Izmir Katip Celebi University',       city: 'Izmir',    country: 'Turkey', programs: ['Medicine','Health Sciences','Social Sci'], logo: '🎓' },
+  { id: 'u8', name: 'Bursa Uludag University',             city: 'Bursa',    country: 'Turkey', programs: ['Engineering','Agriculture','Economics'], logo: '🎓' },
+];
+
+export const getUniversities = async () => UNIVERSITIES;

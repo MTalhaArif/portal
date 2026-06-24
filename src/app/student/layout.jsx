@@ -5,17 +5,15 @@ import { useAuth } from '@/context/AuthContext';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 
-export default function AdminLayout({ children }) {
+export default function StudentLayout({ children }) {
   const { user, profile, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (!loading) {
       if (!user) router.push('/login');
-      else if (profile && profile.role !== 'admin') {
-        if (profile.role === 'agency') router.push('/dashboard');
-        else router.push('/student/dashboard');
-      }
+      else if (profile?.role === 'admin')  router.push('/admin/dashboard');
+      else if (profile?.role === 'agency') router.push('/dashboard');
     }
   }, [user, profile, loading, router]);
 
@@ -26,8 +24,8 @@ export default function AdminLayout({ children }) {
   );
 
   return (
-    <div style={{ display:'flex' }}>
-      <Sidebar role="admin" />
+    <div style={{ display: 'flex' }}>
+      <Sidebar role="student" />
       <div style={{ marginLeft:'var(--sidebar-w)', marginTop:'var(--header-h)', flex:1, minHeight:'calc(100vh - var(--header-h))', padding:'28px', background:'var(--bg)' }}>
         <Header />
         {children}

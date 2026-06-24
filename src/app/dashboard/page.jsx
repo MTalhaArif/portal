@@ -1,153 +1,84 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Users, FileText, ClipboardList, CheckCircle } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
-import { getClients, getUserDocuments, getUserApplications } from '@/lib/firestore';
+import { GraduationCap, FileText, ClipboardList, CheckCircle } from 'lucide-react';
+import { getAllStudents, getAllDocumentsAdmin, getAllApplications } from '@/lib/firestore';
 import StatsCard from '@/components/StatsCard';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
+const STAGES = ['Waiting Approval','Ready for Application','Evaluation','Offer Letter','Payment','Acceptance Letter','Pre-Registered','Registration','Visa Accepted','Visa Rejected'];
 
-const APP_STAGES = [
-  'Waiting Approval', 'Ready for Application', 'Evaluation', 'Offer Letter',
-  'Payment', 'Acceptance Letter', 'Pre-Registered', 'Registration',
-  'Visa Accepted', 'Visa Rejected',
-];
-
-export default function DashboardPage() {
-  const { user, profile } = useAuth();
-  const [stats, setStats] = useState({ clients: null, documents: null, applications: null, approved: null });
+export default function AgencyDashboardPage() {
+  const [students, setStudents] = useState([]);
+  const [docs, setDocs] = useState([]);
   const [apps, setApps] = useState([]);
-  const [recentDocs, setRecentDocs] = useState([]);
 
   useEffect(() => {
-    if (!user) return;
-    Promise.all([
-      getClients(user.uid),
-      getUserDocuments(user.uid),
-      getUserApplications(user.uid),
-    ]).then(([clients, docs, applications]) => {
-      setStats({
-        clients: clients.length,
-        documents: docs.length,
-        applications: applications.length,
-        approved: applications.filter(a => a.status === 'Approved').length,
-      });
-      setApps(applications);
-      setRecentDocs(docs.slice(0, 5));
-    });
-  }, [user]);
+    Promise.all([getAllStudents(), getAllDocumentsAdmin(), getAllApplications()])
+      .then(([s, d, a]) => { setStudents(s); setDocs(d); setApps(a); });
+  }, []);
 
-  // Build stage counts for pie chart
-  const stageCounts = APP_STAGES.reduce((acc, s) => {
-    acc[s] = apps.filter(a => a.stage === s).length;
-    return acc;
-  }, {});
-
+  const approved = apps.filter(a => a.stage === 'Visa Accepted').length;
+  const stageCounts = STAGES.reduce((acc,s) => { acc[s]=apps.filter(a=>a.stage===s).length; return acc; }, {});
   const pieData = {
-    labels: APP_STAGES.filter(s => stageCounts[s] > 0),
-    datasets: [{
-      data: APP_STAGES.filter(s => stageCounts[s] > 0).map(s => stageCounts[s]),
-      backgroundColor: [
-        '#e85d04','#f4a261','#e9c46a','#2a9d8f','#457b9d',
-        '#8b5cf6','#ec4899','#14b8a6','#ef4444','#6b7280',
-      ],
-      borderWidth: 0,
-    }],
+    labels: STAGES.filter(s=>stageCounts[s]>0),
+    datasets:[{ data:STAGES.filter(s=>stageCounts[s]>0).map(s=>stageCounts[s]),
+      backgroundColor:['#e85d04','#f4a261','#e9c46a','#2a9d8f','#457b9d','#8b5cf6','#ec4899','#14b8a6','#22c55e','#ef4444'],
+      borderWidth:0 }],
   };
-
-  const firstName = profile?.fullName?.split(' ')[0] || 'there';
 
   return (
     <div>
-      {/* Page header */}
       <div className="page-header">
         <h1 className="page-title">Agency Dashboard</h1>
-        <p className="page-subtitle">Welcome back, {firstName}</p>
+        <p className="page-subtitle">Overview of your students and applications</p>
       </div>
-
-      {/* Stats */}
       <div className="stats-grid">
-        <StatsCard label="Total Clients"      value={stats.clients}       icon={Users}          color="primary" />
-        <StatsCard label="Documents Uploaded" value={stats.documents}     icon={FileText}       color="info"    />
-        <StatsCard label="Applications"       value={stats.applications}  icon={ClipboardList}  color="warning" />
-        <StatsCard label="Approved"           value={stats.approved}      icon={CheckCircle}    color="success" />
+        <StatsCard label="Total Students"    value={students.length} icon={GraduationCap} color="primary" />
+        <StatsCard label="Total Documents"   value={docs.length}     icon={FileText}      color="info"    />
+        <StatsCard label="Applications"      value={apps.length}     icon={ClipboardList} color="warning" />
+        <StatsCard label="Visa Accepted"     value={approved}        icon={CheckCircle}   color="success" />
       </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
-        {/* Applications by Stage — Pie Chart */}
-        <div className="card" style={{ padding: 24 }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 20 }}>Applications by Stage</h2>
-          {apps.length > 0 ? (
-            <div style={{ maxWidth: 320, margin: '0 auto' }}>
-              <Doughnut data={pieData} options={{
-                plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
-                cutout: '60%',
-              }} />
-            </div>
-          ) : (
-            <div className="empty-state">
-              <ClipboardList size={40} />
-              <p>No applications yet</p>
-            </div>
-          )}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginBottom:24 }}>
+        <div className="card" style={{ padding:24 }}>
+          <h2 style={{ fontSize:'1rem', fontWeight:700, marginBottom:20 }}>Applications by Stage</h2>
+          {apps.length>0
+            ? <div style={{ maxWidth:280, margin:'0 auto' }}><Doughnut data={pieData} options={{ plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12, font:{ size:11 } } } }, cutout:'60%' }} /></div>
+            : <div className="empty-state"><p>No applications yet</p></div>}
         </div>
-
-        {/* Application Stages table */}
-        <div className="card" style={{ padding: 24 }}>
-          <div className="flex items-center justify-between mb-4">
-            <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>Application Stages</h2>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px 20px' }}>
-            {APP_STAGES.map(stage => (
-              <div key={stage} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border-light)' }}>
-                <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>{stage}</span>
-                <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{stageCounts[stage]}</span>
+        <div className="card" style={{ padding:24 }}>
+          <h2 style={{ fontSize:'1rem', fontWeight:700, marginBottom:16 }}>Stage Breakdown</h2>
+          <div style={{ display:'flex', flexDirection:'column', gap:4 }}>
+            {STAGES.map(s=>(
+              <div key={s} style={{ display:'flex', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid var(--border-light)', fontSize:'0.8125rem' }}>
+                <span style={{ color:'var(--text-secondary)' }}>{s}</span>
+                <span style={{ fontWeight:700 }}>{stageCounts[s]}</span>
               </div>
             ))}
           </div>
         </div>
       </div>
-
-      {/* Recent Documents */}
-      <div className="card" style={{ padding: 24 }}>
-        <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 16 }}>Recent Documents</h2>
-        {recentDocs.length > 0 ? (
-          <div className="table-wrapper">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>File Name</th>
-                  <th>Category</th>
-                  <th>Uploaded</th>
-                  <th>Status</th>
+      {/* Recent students */}
+      <div className="card" style={{ padding:24 }}>
+        <h2 style={{ fontSize:'1rem', fontWeight:700, marginBottom:16 }}>Recent Students</h2>
+        <div className="table-wrapper">
+          <table className="data-table">
+            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Nationality</th><th>Joined</th></tr></thead>
+            <tbody>
+              {students.length===0&&<tr><td colSpan={5}><div className="empty-state" style={{ padding:30 }}><p>No students yet</p></div></td></tr>}
+              {students.slice(0,6).map(s=>(
+                <tr key={s.id}>
+                  <td style={{ fontWeight:600 }}>{s.fullName}</td>
+                  <td className="muted">{s.email}</td>
+                  <td className="muted">{s.phone||'—'}</td>
+                  <td className="muted">{s.nationality||'—'}</td>
+                  <td className="muted">{s.createdAt?.toDate?.().toLocaleDateString()||s.createdAt?.split?.('T')[0]||'—'}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {recentDocs.map(doc => (
-                  <tr key={doc.id}>
-                    <td>{doc.fileName}</td>
-                    <td className="muted">{doc.category}</td>
-                    <td className="muted">{doc.createdAt?.toDate?.().toLocaleDateString() || '—'}</td>
-                    <td>
-                      <span className={`badge ${
-                        doc.status === 'Approved' ? 'badge-success'
-                        : doc.status === 'Rejected' ? 'badge-danger'
-                        : 'badge-warning'
-                      }`}>{doc.status}</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="empty-state">
-            <FileText size={40} />
-            <p>No documents uploaded yet. <a href="/dashboard/documents" style={{ color: 'var(--primary)' }}>Upload one →</a></p>
-          </div>
-        )}
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

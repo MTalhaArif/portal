@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, FileText, Shield, Users } from 'lucide-react';
+import { Eye, EyeOff, GraduationCap, FileText, Shield, Building2 } from 'lucide-react';
 import { loginUser } from '@/lib/auth';
 import { getUserProfile } from '@/lib/auth';
 import styles from '../auth.module.css';
@@ -22,11 +22,9 @@ export default function LoginPage() {
     try {
       const user = await loginUser(email, password);
       const profile = await getUserProfile(user.uid);
-      if (profile?.role === 'admin') {
-        router.push('/admin/dashboard');
-      } else {
-        router.push('/dashboard');
-      }
+      if (profile?.role === 'admin')  router.push('/admin/dashboard');
+      else if (profile?.role === 'agency') router.push('/dashboard');
+      else router.push('/student/dashboard');
     } catch (err) {
       setError(getFriendlyError(err.code));
     } finally {
@@ -43,21 +41,21 @@ export default function LoginPage() {
           <div className={styles.brandTitle}>Partners<br /><span>Portal</span></div>
         </div>
         <p className={styles.tagline}>
-          Streamlining client admissions and document management — fast, reliable, and smart.
+          Your gateway to Turkish universities — students, agencies, and admins in one place.
         </p>
         <div className={styles.dividerLine} />
         <ul className={styles.featureList}>
           <li className={styles.featureItem}>
-            <span className={styles.featureIcon}><Users size={16} /></span>
-            Manage all your clients in one place
+            <span className={styles.featureIcon}><GraduationCap size={16} /></span>
+            Students — apply &amp; upload documents
           </li>
           <li className={styles.featureItem}>
-            <span className={styles.featureIcon}><FileText size={16} /></span>
-            Secure document upload & tracking
+            <span className={styles.featureIcon}><Building2 size={16} /></span>
+            Agencies — manage applicants
           </li>
           <li className={styles.featureItem}>
             <span className={styles.featureIcon}><Shield size={16} /></span>
-            Admin review & approval workflow
+            Admins — full platform control
           </li>
         </ul>
       </div>
@@ -73,35 +71,18 @@ export default function LoginPage() {
           <form className={styles.formGrid} onSubmit={handleSubmit}>
             <div className="form-group">
               <label className="form-label">Email</label>
-              <input
-                id="login-email"
-                type="email"
-                className="form-input"
-                placeholder="you@example.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-              />
+              <input id="login-email" type="email" className="form-input"
+                placeholder="you@example.com" value={email}
+                onChange={e => setEmail(e.target.value)} required />
             </div>
 
             <div className="form-group">
               <label className="form-label">Password</label>
               <div className={styles.passwordWrapper}>
-                <input
-                  id="login-password"
-                  type={showPass ? 'text' : 'password'}
-                  className="form-input"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  required
-                />
-                <button
-                  type="button"
-                  className={styles.eyeBtn}
-                  onClick={() => setShowPass(!showPass)}
-                  aria-label="Toggle password"
-                >
+                <input id="login-password" type={showPass ? 'text' : 'password'}
+                  className="form-input" placeholder="••••••••"
+                  value={password} onChange={e => setPassword(e.target.value)} required />
+                <button type="button" className={styles.eyeBtn} onClick={() => setShowPass(!showPass)}>
                   {showPass ? <EyeOff size={17} /> : <Eye size={17} />}
                 </button>
               </div>
@@ -112,13 +93,21 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className={styles.linkRow}>
-            <span className="text-sm text-muted">Don&apos;t have an account?</span>
-            <Link href="/signup" className={styles.link}>Sign up</Link>
+          {/* Student signup only */}
+          <div style={{ marginTop: 20, padding: '16px', background: '#f8f9fa', borderRadius: 10, textAlign: 'center', border: '1px solid var(--border)' }}>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 8 }}>
+              <GraduationCap size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
+              Are you a <strong>student</strong>?
+            </p>
+            <Link href="/signup" className={styles.link} style={{ fontSize: '0.9rem' }}>
+              Create a student account →
+            </Link>
           </div>
-          <div className={styles.linkRow}>
-            <span />
-            <Link href="/forgot-password" className={styles.link}>Forgot password?</Link>
+
+          <div className={styles.linkRow} style={{ marginTop: 12, justifyContent: 'center' }}>
+            <Link href="/forgot-password" className={styles.link} style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+              Forgot password?
+            </Link>
           </div>
         </div>
       </div>
@@ -128,9 +117,9 @@ export default function LoginPage() {
 
 function getFriendlyError(code) {
   switch (code) {
-    case 'auth/user-not-found': return 'No account found with this email.';
-    case 'auth/wrong-password': return 'Incorrect password. Please try again.';
-    case 'auth/invalid-credential': return 'Invalid email or password.';
+    case 'auth/user-not-found':    return 'No account found with this email.';
+    case 'auth/wrong-password':    return 'Incorrect password. Please try again.';
+    case 'auth/invalid-credential':return 'Invalid email or password.';
     case 'auth/too-many-requests': return 'Too many attempts. Please try again later.';
     default: return 'Sign in failed. Please try again.';
   }

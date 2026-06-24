@@ -9,8 +9,8 @@ function saveUsers(users) {
   localStorage.setItem('pp_users', JSON.stringify(users));
 }
 
-// ─── Register ──────────────────────────────────────────────────────────────────
-export async function registerUser({ email, password, fullName, company, phone, role = 'client' }) {
+// ─── Register (students only — agencies are created by admin) ─────────────────
+export async function registerUser({ email, password, fullName, phone, nationality, dateOfBirth, role = 'student' }) {
   const users = getUsers();
   if (users.find(u => u.email === email)) {
     const err = new Error('Email already in use');
@@ -19,14 +19,16 @@ export async function registerUser({ email, password, fullName, company, phone, 
   }
   const uid = 'uid_' + Date.now() + '_' + Math.random().toString(36).slice(2);
   const user = {
-    uid, email, password, fullName, company: company || '',
-    phone: phone || '', role, status: 'active',
+    uid, email, password, fullName,
+    phone: phone || '', nationality: nationality || '',
+    dateOfBirth: dateOfBirth || '',
+    role,   // 'student' | 'agency' | 'admin'
+    status: 'active',
     photoURL: '', createdAt: new Date().toISOString(),
   };
   users.push(user);
   saveUsers(users);
 
-  // Also save to the "users" collection
   const col = getCollection('users');
   col.push({ ...user, id: uid });
   saveCollection('users', col);
@@ -34,6 +36,11 @@ export async function registerUser({ email, password, fullName, company, phone, 
   const sessionUser = { uid, email, displayName: fullName };
   auth._notify(sessionUser);
   return sessionUser;
+}
+
+// ─── Create Agency account (admin only) ───────────────────────────────────────
+export async function createAgencyAccount({ email, password, fullName, company, phone }) {
+  return registerUser({ email, password, fullName, phone, role: 'agency' });
 }
 
 // ─── Login ─────────────────────────────────────────────────────────────────────
@@ -61,7 +68,7 @@ export async function getUserProfile(uid) {
   return col.find(u => u.uid === uid || u.id === uid) || null;
 }
 
-// ─── Password reset (mock — just shows a message) ─────────────────────────────
+// ─── Password reset (local — informational only) ───────────────────────────────
 export async function resetPassword(email) {
   const users = getUsers();
   if (!users.find(u => u.email === email)) {
@@ -69,7 +76,6 @@ export async function resetPassword(email) {
     err.code = 'auth/user-not-found';
     throw err;
   }
-  // In local mode, we can't actually send email. Just resolve.
   return true;
 }
 

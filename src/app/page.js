@@ -10,17 +10,15 @@ export default function HomePage() {
   useEffect(() => {
     if (!loading) {
       if (!user) router.push('/login');
-      else if (profile?.role === 'admin') router.push('/admin/dashboard');
-      else router.push('/dashboard');
+      else if (profile?.role === 'admin')   router.push('/admin/dashboard');
+      else if (profile?.role === 'agency')  router.push('/dashboard');
+      else                                   router.push('/student/dashboard');
     }
   }, [user, profile, loading, router]);
 
   return (
-    <div style={{
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      minHeight: '100vh', background: 'var(--bg)'
-    }}>
-      <span className="spinner spinner-dark" style={{ width: 40, height: 40 }} />
+    <div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100vh', background:'var(--bg)' }}>
+      <span className="spinner spinner-dark" style={{ width:40, height:40 }} />
     </div>
   );
 }
