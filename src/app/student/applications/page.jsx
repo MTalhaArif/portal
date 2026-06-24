@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Plus, ChevronRight, ChevronLeft, ClipboardList, Globe, CloudUpload, FileText, Trash2, Eye } from 'lucide-react';
+import { Plus, ChevronRight, ChevronLeft, ClipboardList, Globe, CloudUpload, FileText, Trash2, Eye, Search } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { getUserApplications, addApplication, UNIVERSITIES } from '@/lib/firestore';
 import { uploadFile, deleteFile } from '@/lib/storage';
@@ -27,6 +27,7 @@ export default function StudentApplicationsPage() {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [toast, setToast] = useState('');
+  const [uniSearch, setUniSearch] = useState('');
 
   const load = async () => { if (!user) return; const d = await getUserApplications(user.uid); setApps(d); };
   useEffect(() => { load(); }, [user]);
@@ -104,37 +105,53 @@ export default function StudentApplicationsPage() {
 
   const renderStep = () => {
     switch(step) {
-      case 0: return (
-        <div>
-          <p style={{ fontSize:'0.875rem', color:'var(--text-secondary)', marginBottom:16 }}>Select a university and program to apply to:</p>
-          <div style={{ display:'flex', flexDirection:'column', gap:12, maxHeight:400, overflowY:'auto' }}>
-            {UNIVERSITIES.map(uni => (
-              <div key={uni.id} style={{ border:`2px solid ${form.universityId===uni.id?'var(--primary)':'var(--border)'}`, borderRadius:10, padding:16, cursor:'pointer', background: form.universityId===uni.id?'var(--primary-light)':'#fff', transition:'all 0.15s' }}
-                onClick={() => setForm(p=>({...p, universityId:uni.id, university:uni.name, program: p.universityId===uni.id ? p.program : ''}))}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p style={{ fontWeight:700, marginBottom:4 }}>{uni.logo} {uni.name}</p>
-                    <p style={{ fontSize:'0.8rem', color:'var(--text-secondary)' }}>{uni.city}, {uni.country}</p>
-                  </div>
-                </div>
-                {form.universityId === uni.id && (
-                  <div style={{ marginTop:12 }}>
-                    <p style={{ fontWeight:600, fontSize:'0.8125rem', marginBottom:8 }}>Choose a program:</p>
-                    <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
-                      {uni.programs.map(prog => (
-                        <button key={prog} onClick={e=>{e.stopPropagation(); setForm(p=>({...p,program:prog}));}}
-                          style={{ padding:'4px 12px', borderRadius:99, border:`1.5px solid ${form.program===prog?'var(--primary)':'var(--border)'}`, background:form.program===prog?'var(--primary)':'#fff', color:form.program===prog?'#fff':'var(--text-primary)', fontSize:'0.8rem', fontWeight:500, cursor:'pointer' }}>
-                          {prog}
-                        </button>
-                      ))}
+      case 0: {
+        const filteredUnis = UNIVERSITIES.filter(u => u.name.toLowerCase().includes(uniSearch.toLowerCase()) || (u.location && u.location.toLowerCase().includes(uniSearch.toLowerCase())));
+        return (
+          <div style={{ display:'flex', flexDirection:'column', height:'100%' }}>
+            <p style={{ fontSize:'0.875rem', color:'var(--text-secondary)', marginBottom:12 }}>Select a university and program to apply to:</p>
+            
+            <div className="search-box" style={{ marginBottom: 16 }}>
+              <Search size={15} />
+              <input type="text" className="form-input" placeholder="Search for a university..."
+                value={uniSearch} onChange={e => setUniSearch(e.target.value)} />
+            </div>
+
+            <div style={{ display:'flex', flexDirection:'column', gap:12, maxHeight:360, overflowY:'auto', paddingRight:8 }}>
+              {filteredUnis.length === 0 && (
+                <div style={{ padding:24, textAlign:'center', color:'var(--text-secondary)' }}>No universities found.</div>
+              )}
+              {filteredUnis.map(uni => (
+                <div key={uni.id} style={{ border:`2px solid ${form.universityId===uni.id?'var(--primary)':'var(--border)'}`, borderRadius:10, padding:16, cursor:'pointer', background: form.universityId===uni.id?'var(--primary-light)':'#fff', transition:'all 0.15s' }}
+                  onClick={() => setForm(p=>({...p, universityId:uni.id, university:uni.name, program: p.universityId===uni.id ? p.program : ''}))}>
+                  
+                  <div className="flex items-center gap-3">
+                    <img src={uni.logo} alt="" style={{ width:40, height:40, borderRadius:8, objectFit:'cover', border:'1px solid var(--border-light)' }} />
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <p style={{ fontWeight:700, marginBottom:2, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{uni.name}</p>
+                      <p style={{ fontSize:'0.8rem', color:'var(--text-secondary)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{uni.location}</p>
                     </div>
                   </div>
-                )}
-              </div>
-            ))}
+                  
+                  {form.universityId === uni.id && (
+                    <div style={{ marginTop:16, paddingTop:16, borderTop:'1px solid var(--border-light)' }}>
+                      <p style={{ fontWeight:600, fontSize:'0.8125rem', marginBottom:10 }}>Choose a program to apply for:</p>
+                      <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+                        {uni.programs.map(prog => (
+                          <button key={prog} onClick={e=>{e.stopPropagation(); setForm(p=>({...p,program:prog}));}}
+                            style={{ padding:'6px 12px', borderRadius:8, border:`1.5px solid ${form.program===prog?'var(--primary)':'var(--border)'}`, background:form.program===prog?'var(--primary)':'#fff', color:form.program===prog?'#fff':'var(--text-primary)', fontSize:'0.8rem', fontWeight:600, cursor:'pointer', transition:'all 0.15s' }}>
+                            {prog}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      );
+        );
+      }
       case 1: return (
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
           <div className="form-group">
