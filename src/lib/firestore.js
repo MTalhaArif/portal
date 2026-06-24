@@ -78,6 +78,39 @@ export const getAllAgencies = async () => {
 // ─── Universities — 19 real partner universities from partnersportaltr.com ─────
 import UNIVERSITIES_DATA from './universities_data.json';
 
-export const UNIVERSITIES = UNIVERSITIES_DATA;
+function initUniversities() {
+  if (typeof window === 'undefined') return UNIVERSITIES_DATA;
+  const cached = localStorage.getItem('pp_col_universities');
+  if (!cached || cached === '[]') {
+    localStorage.setItem('pp_col_universities', JSON.stringify(UNIVERSITIES_DATA));
+    return UNIVERSITIES_DATA;
+  }
+  try {
+    return JSON.parse(cached);
+  } catch (e) {
+    return UNIVERSITIES_DATA;
+  }
+}
 
-export const getUniversities = async () => UNIVERSITIES;
+// We mutate this array for in-memory updates without reload
+export const UNIVERSITIES = initUniversities();
+
+export const getUniversities = async () => getCollection('universities');
+
+export const addUniversity = async (data) => {
+  const id = await addDocument('universities', data);
+  UNIVERSITIES.unshift({ ...data, id });
+  return id;
+};
+
+export const updateUniversity = async (id, data) => {
+  await updateDocument('universities', id, data);
+  const idx = UNIVERSITIES.findIndex(u => u.id === id);
+  if (idx !== -1) Object.assign(UNIVERSITIES[idx], data);
+};
+
+export const removeUniversity = async (id) => {
+  await removeDocument('universities', id);
+  const idx = UNIVERSITIES.findIndex(u => u.id === id);
+  if (idx !== -1) UNIVERSITIES.splice(idx, 1);
+};

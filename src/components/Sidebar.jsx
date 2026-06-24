@@ -24,6 +24,7 @@ const agencyNav = [
   { href: '/dashboard/students',     icon: GraduationCap,   label: 'Students'   },
   { href: '/dashboard/applications', icon: ClipboardList,   label: 'Apply'      },
   { href: '/dashboard/documents',    icon: FileText,        label: 'Documents'  },
+  { href: '/dashboard/universities', icon: Globe,           label: 'Unis'       },
   { href: '/dashboard/analytics',    icon: BarChart2,       label: 'Analytics'  },
 ];
 
@@ -34,6 +35,7 @@ const adminNav = [
   { href: '/admin/agencies',         icon: Building2,       label: 'Agencies'   },
   { href: '/admin/applications',     icon: ClipboardList,   label: 'Apply'      },
   { href: '/admin/documents',        icon: FileText,        label: 'Documents'  },
+  { href: '/admin/universities',     icon: Globe,           label: 'Unis'       },
   { href: '/admin/analytics',        icon: BarChart2,       label: 'Analytics'  },
 ];
 
