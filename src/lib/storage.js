@@ -1,36 +1,44 @@
-import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
-import { storage } from './firebase';
+// ─── localStorage Storage mock ─────────────────────────────────────────────────
+// Files are stored as base64 data URLs in localStorage.
+// Max practical size: ~5MB per file (localStorage limit).
 
 /**
- * Upload a file to Firebase Storage.
- * @param {File} file - The file to upload
- * @param {string} path - Storage path, e.g. "documents/uid/filename"
- * @param {function} onProgress - optional callback(percentage)
- * @returns {Promise<string>} download URL
+ * Upload a file — stores it as base64 in localStorage.
+ * @param {File} file
+ * @param {string} path - used as the storage key
+ * @param {function} onProgress
+ * @returns {Promise<string>} data URL (acts as download URL)
  */
 export function uploadFile(file, path, onProgress) {
   return new Promise((resolve, reject) => {
-    const storageRef = ref(storage, path);
-    const task = uploadBytesResumable(storageRef, file);
+    const reader = new FileReader();
 
-    task.on(
-      'state_changed',
-      (snapshot) => {
-        const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-        if (onProgress) onProgress(pct);
-      },
-      reject,
-      async () => {
-        const url = await getDownloadURL(task.snapshot.ref);
-        resolve(url);
+    reader.onprogress = (e) => {
+      if (e.lengthComputable && onProgress) {
+        onProgress(Math.round((e.loaded / e.total) * 100));
       }
-    );
+    };
+
+    reader.onload = () => {
+      try {
+        const dataUrl = reader.result;
+        localStorage.setItem('pp_file_' + path, dataUrl);
+        if (onProgress) onProgress(100);
+        resolve(dataUrl);
+      } catch (err) {
+        // localStorage quota exceeded
+        reject(new Error('File too large for local storage. Please use a file under 4MB.'));
+      }
+    };
+
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsDataURL(file);
   });
 }
 
 /**
- * Delete a file from Firebase Storage by its full path.
+ * Delete a stored file.
  */
 export async function deleteFile(filePath) {
-  await deleteObject(ref(storage, filePath));
+  localStorage.removeItem('pp_file_' + filePath);
 }

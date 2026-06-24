@@ -2,8 +2,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { updateDocument } from '@/lib/firestore';
-import { updateProfile } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 
 export default function AdminSettingsPage() {
   const { user, profile } = useAuth();
@@ -24,7 +22,6 @@ export default function AdminSettingsPage() {
     setLoading(true);
     try {
       await updateDocument('users', user.uid, { fullName: form.fullName, phone: form.phone });
-      await updateProfile(auth.currentUser, { displayName: form.fullName });
       showToast('Settings saved');
     } catch { showToast('Failed to save', 'error'); }
     finally { setLoading(false); }

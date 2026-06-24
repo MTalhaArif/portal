@@ -1,6 +1,5 @@
 'use client';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { getUserProfile } from '@/lib/auth';
 
@@ -12,7 +11,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsub = auth.onAuthStateChanged(async (firebaseUser) => {
       if (firebaseUser) {
         setUser(firebaseUser);
         const p = await getUserProfile(firebaseUser.uid);

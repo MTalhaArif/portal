@@ -2,8 +2,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { updateDocument } from '@/lib/firestore';
-import { updateProfile } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 
 export default function SettingsPage() {
   const { user, profile } = useAuth();
@@ -33,7 +31,6 @@ export default function SettingsPage() {
     setLoading(true);
     try {
       await updateDocument('users', user.uid, { fullName: form.fullName, phone: form.phone, company: form.company, country: form.country });
-      await updateProfile(auth.currentUser, { displayName: form.fullName });
       showToast('Profile updated successfully');
     } catch {
       showToast('Update failed', 'error');

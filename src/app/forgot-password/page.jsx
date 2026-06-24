@@ -42,8 +42,13 @@ export default function ForgotPasswordPage() {
           {sent ? (
             <div style={{ textAlign: 'center', padding: '20px 0' }}>
               <Mail size={48} color="var(--primary)" style={{ margin: '0 auto 16px' }} />
-              <p style={{ fontWeight: 600, marginBottom: 8 }}>Check your inbox</p>
-              <p className="text-sm text-muted">A password reset link was sent to <strong>{email}</strong></p>
+              <p style={{ fontWeight: 600, marginBottom: 8 }}>Request received</p>
+              <p className="text-sm text-muted" style={{ marginBottom: 8 }}>
+                Account found for <strong>{email}</strong>.
+              </p>
+              <p className="text-sm text-muted">
+                In local mode, to reset your password please sign up again with a new account or contact your admin.
+              </p>
               <Link href="/login" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginTop: 24, color: 'var(--primary)', fontWeight: 600 }}>
                 <ArrowLeft size={16} /> Back to Sign in
               </Link>
