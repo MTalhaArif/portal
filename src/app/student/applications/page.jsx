@@ -1,8 +1,9 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Plus, ChevronRight, ChevronLeft, ClipboardList, Globe } from 'lucide-react';
+import { Plus, ChevronRight, ChevronLeft, ClipboardList, Globe, CloudUpload, FileText, Trash2, Eye } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { getUserApplications, addApplication, UNIVERSITIES } from '@/lib/firestore';
+import { uploadFile, deleteFile } from '@/lib/storage';
 
 const STAGES = ['Waiting Approval','Ready for Application','Evaluation','Offer Letter','Payment','Acceptance Letter','Pre-Registered','Registration','Visa Accepted','Visa Rejected'];
 const DEGREE_TYPES = ['Bachelor','Master','PhD','Associate','Certificate'];
@@ -13,7 +14,7 @@ const EMPTY = {
   universityId:'', university:'', program:'',
   term: TERMS[0], degreeType:'Bachelor',
   firstName:'', lastName:'', dateOfBirth:'', nationality:'', passportNumber:'',
-  email:'', phone:'', gpa:'', docNotes:'',
+  email:'', phone:'', gpa:'', docNotes:'', documents: []
 };
 
 export default function StudentApplicationsPage() {
@@ -23,6 +24,8 @@ export default function StudentApplicationsPage() {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState(EMPTY);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [toast, setToast] = useState('');
 
   const load = async () => { if (!user) return; const d = await getUserApplications(user.uid); setApps(d); };
@@ -59,6 +62,37 @@ export default function StudentApplicationsPage() {
       setShowWizard(false); setStep(0); setForm(EMPTY);
       await load();
     } finally { setLoading(false); }
+  };
+
+  const handleFiles = async (files) => {
+    if (!files.length) return;
+    setUploading(true); setProgress(0);
+    try {
+      const newDocs = [];
+      for (let i=0; i<files.length; i++) {
+        const file = files[i];
+        if (file.size > 5*1024*1024) { showToast(`File ${file.name} too large (max 5MB)`); continue; }
+        const path = `applications/${user.uid}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+        const url = await uploadFile(file, path, setProgress);
+        newDocs.push({
+          fileName: file.name, fileSize: file.size, fileType: file.type,
+          storagePath: path, downloadURL: url, uploadedAt: new Date().toISOString()
+        });
+      }
+      setForm(p => ({ ...p, documents: [...(p.documents||[]), ...newDocs] }));
+    } catch(err) {
+      showToast(err.message || 'Upload failed');
+    } finally {
+      setUploading(false); setProgress(0);
+    }
+  };
+
+  const removeDoc = async (idx) => {
+    const doc = form.documents[idx];
+    if (doc.storagePath) {
+      try { await deleteFile(doc.storagePath); } catch (e) { console.error(e); }
+    }
+    setForm(p => ({ ...p, documents: p.documents.filter((_, i) => i !== idx) }));
   };
 
   const badgeClass = (stage) => {
@@ -137,12 +171,48 @@ export default function StudentApplicationsPage() {
       case 3: return (
         <div>
           <p style={{ fontSize:'0.875rem', color:'var(--text-secondary)', marginBottom:16 }}>
-            Upload your documents in the <a href="/student/documents" style={{ color:'var(--primary)' }}>Documents section</a>, then add notes below.
+            Upload required documents (Passport, Transcript, etc.). Max 5MB per file.
           </p>
+          
+          <div
+            onDragOver={e=>{e.preventDefault();}}
+            onDrop={e=>{e.preventDefault();handleFiles(e.dataTransfer.files);}}
+            style={{ border:'2px dashed var(--border)', borderRadius:'var(--radius)', padding:'24px', textAlign:'center', marginBottom:16 }}
+          >
+            <input id="wizard-upload" type="file" multiple style={{ display:'none' }} onChange={e=>handleFiles(e.target.files)} accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+            <CloudUpload size={32} style={{ color:'var(--primary)', margin:'0 auto 8px' }} />
+            <p style={{ fontWeight:600, fontSize:'0.9rem' }}>Drag files here or <span style={{color:'var(--primary)', cursor:'pointer'}} onClick={()=>document.getElementById('wizard-upload').click()}>browse</span></p>
+            {uploading && (
+              <div style={{ marginTop:12 }}>
+                <div style={{ background:'#e5e7eb', borderRadius:99, height:6, overflow:'hidden' }}>
+                  <div style={{ height:'100%', background:'var(--primary)', width:`${progress}%`, transition:'width 0.3s' }} />
+                </div>
+                <p style={{ marginTop:4, fontSize:'0.75rem', color:'var(--text-secondary)' }}>Uploading... {progress}%</p>
+              </div>
+            )}
+          </div>
+
+          {(form.documents?.length > 0) && (
+            <div style={{ marginBottom:16 }}>
+              {form.documents.map((doc, idx) => (
+                <div key={idx} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'8px 12px', background:'#f8f9fa', borderRadius:8, marginBottom:6 }}>
+                  <div className="flex items-center gap-2" style={{ fontSize:'0.85rem', fontWeight:500, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                    <FileText size={14} style={{ color:'var(--primary)' }} flexShrink={0}/>
+                    {doc.fileName}
+                  </div>
+                  <div className="flex gap-2">
+                    <a href={doc.downloadURL} target="_blank" rel="noreferrer" className="btn btn-ghost btn-icon" style={{ padding:4 }}><Eye size={14}/></a>
+                    <button className="btn btn-ghost btn-icon" style={{ padding:4, color:'var(--danger)' }} onClick={()=>removeDoc(idx)}><Trash2 size={14}/></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
           <div className="form-group">
             <label className="form-label">Document Notes</label>
-            <textarea className="form-input" rows={4} value={form.docNotes} onChange={set('docNotes')}
-              placeholder="List documents uploaded: Passport ✓, Transcript ✓, etc." />
+            <textarea className="form-input" rows={3} value={form.docNotes} onChange={set('docNotes')}
+              placeholder="Any additional notes about your documents..." />
           </div>
         </div>
       );
