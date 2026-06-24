@@ -1,0 +1,65 @@
+
+
+--- https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCHt4UVIPlyAC9AofPoppWMF5heQ8Ark9M ---
+{
+  "kind": "identitytoolkit#VerifyPasswordResponse",
+  "localId": "QShXJtcY5ghxmUKngXIPITp67LH3",
+  "email": "talhaarif31@gmail.com",
+  "displayName": "",
+  "idToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjJmMjk1MGEyNGFlYWRkMjYzYzIxM2I2MDNhZjMxNWEzMjdiNmM3MjAiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vYWRtaXNzaW9uLXdpcmVmcmFtZSIsImF1ZCI6ImFkbWlzc2lvbi13aXJlZnJhbWUiLCJhdXRoX3RpbWUiOjE3ODIzMjIyMTcsInVzZXJfaWQiOiJRU2hYSnRjWTVnaHhtVUtuZ1hJUElUcDY3TEgzIiwic3ViIjoiUVNoWEp0Y1k1Z2h4bVVLbmdYSVBJVHA2N0xIMyIsImlhdCI6MTc4MjMyMjIxNywiZXhwIjoxNzgyMzI1ODE3LCJlbWFpbCI6InRhbGhhYXJpZjMxQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJ0YWxoYWFyaWYzMUBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.EEPhwRU8X4s19ddSrCuyq0UgZhGcviM9SvDByxkrRDj3IBRLvERyNsr99tu2cAGRqckMe51NsIvI-eSrBgBisyxdLRTsdgOcAE5x_bZ-Y0cTwqsPXBBqgi4OmmZWkIZi-Yg0nzPV_QtwvL155jEYv8-N2qG0gnUE2D5R3wXE5G7jsEHxu4IfS3QFK-Zw_gmRsykv7MHUTmbw-PXBcYu_-RQHSctig6v2eYwhsjNZgm45NaNx5PGB4HnQH-PtyCdbX5fdxjzZarnWCeNDOcGTGIWzgPuB6Sp6cnWDkmssTYDNg8ki-c_KD5GwylYJFU03KkePWGtTMdVgwerGA0Qhtg",
+  "registered": true,
+  "refreshToken": "AMf-vBy0u3aPvdDhe9ZQgkMStA2mB8BVjasDaHN6X2mm_oq2CBgDGVEugIh9_r3DNdlyGc5VmXn3CGUvd83xQh77nLT3-jFJKLQUTYuqE0XsxePWF7XTVic6aFkBRGYOcWwT1ChCKKSaDeqsUDn6lw70cU74RiclqSIeFAwgic3IqkqV9XBs7ekbd1nuV0U-9R0cR7bseBy__V1odZr4KPiMl-LQ4s_qRGB-0AMJ3DwhSlmwnc3nkE4",
+  "expiresIn": "3600"
+}
+
+--- https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyCHt4UVIPlyAC9AofPoppWMF5heQ8Ark9M ---
+{
+  "kind": "identitytoolkit#GetAccountInfoResponse",
+  "users": [
+    {
+      "localId": "QShXJtcY5ghxmUKngXIPITp67LH3",
+      "email": "talhaarif31@gmail.com",
+      "passwordHash": "UkVEQUNURUQ=",
+      "emailVerified": false,
+      "passwordUpdatedAt": 1779113350754,
+      "providerUserInfo": [
+        {
+          "providerId": "password",
+          "federatedId": "talhaarif31@gmail.com",
+          "email": "talhaarif31@gmail.com",
+          "rawId": "talhaarif31@gmail.com"
+        }
+      ],
+      "validSince": "1779113350",
+      "lastLoginAt": "1782322217517",
+      "createdAt": "1779113350754",
+      "lastRefreshAt": "2026-06-24T17:30:17.517Z"
+    }
+  ]
+}
+
+--- https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyCHt4UVIPlyAC9AofPoppWMF5heQ8Ark9M ---
+{
+  "kind": "identitytoolkit#GetAccountInfoResponse",
+  "users": [
+    {
+      "localId": "QShXJtcY5ghxmUKngXIPITp67LH3",
+      "email": "talhaarif31@gmail.com",
+      "passwordHash": "UkVEQUNURUQ=",
+      "emailVerified": false,
+      "passwordUpdatedAt": 1779113350754,
+      "providerUserInfo": [
+        {
+          "providerId": "password",
+          "federatedId": "talhaarif31@gmail.com",
+          "email": "talhaarif31@gmail.com",
+          "rawId": "talhaarif31@gmail.com"
+        }
+      ],
+      "validSince": "1779113350",
+      "lastLoginAt": "1782322217517",
+      "createdAt": "1779113350754",
+      "lastRefreshAt": "2026-06-24T17:30:17.517Z"
+    }
+  ]
+}
